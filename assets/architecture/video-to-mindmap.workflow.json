@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "video-to-mindmap 端到端工作流与技术架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "f:/skills/video-to-mindmap/assets/architecture/video-to-mindmap.workflow.html",
+    "legend": {
+      "mode": "hidden"
+    },
+    "views": [
+      {
+        "id": "full-flow",
+        "label": "端到端主工作流",
+        "focus": ["video_src", "cli_doctor", "audio_fetch", "text_struct", "cli_render", "web_runtime"],
+        "note": "从视频输入、依赖自检、双轨提取到单文件编译与交互脑图交付的完整闭环。"
+      },
+      {
+        "id": "dual-track",
+        "label": "双轨解耦特征提取",
+        "focus": ["audio_fetch", "text_struct", "scene_detect", "visual_anno"],
+        "note": "文本语义流与场景突变视觉流解耦并行，兼顾概念结构化与关键图谱保留。"
+      },
+      {
+        "id": "compiler-delivery",
+        "label": "单文件编译与交付",
+        "focus": ["cli_render", "web_runtime"],
+        "note": "零服务端依赖编译，Markmap 引擎与 Base64 资产内嵌，纯前端离线导出。"
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "ingest", "label": "输入接入与自检层 (Ingest & Diagnostics)" },
+    { "id": "semantic", "label": "语义时序流轨道 (Semantic Pipeline)" },
+    { "id": "visual", "label": "视觉高熵流轨道 (Visual Pipeline)" },
+    { "id": "delivery", "label": "编译交互与交付层 (Compiler & Delivery)" }
+  ],
+  "phases": [
+    { "id": "p_intake", "label": "输入接入与自检", "fromCol": 0, "toCol": 1 },
+    { "id": "p_pipeline", "label": "双轨解耦并行提取", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "p_compile", "label": "多模态编译封装", "fromCol": 4, "toCol": 4 },
+    { "id": "p_runtime", "label": "视窗交互与离线导出", "fromCol": 5, "toCol": 5 }
+  ],
+  "groups": [
+    { "id": "g_sem", "label": "语义轨道 (字幕与音频时序流)", "lane": "semantic", "fromCol": 2, "toCol": 3 },
+    { "id": "g_vis", "label": "视觉轨道 (场景突变与高熵视觉流)", "lane": "visual", "fromCol": 2, "toCol": 3 }
+  ],
+  "mainPath": ["video_src", "cli_doctor", "audio_fetch", "text_struct", "cli_render", "web_runtime"],
+  "nodes": [
+    { "id": "video_src", "lane": "ingest", "col": 0, "type": "external", "label": "长视频输入源", "sublabel": "URL / 本地视频", "width": 136 },
+    { "id": "cli_doctor", "lane": "ingest", "col": 1, "type": "security", "label": "环境自检引擎", "sublabel": "cli.py doctor (依赖校验)", "tag": "前置门禁", "width": 140 },
+    { "id": "audio_fetch", "lane": "semantic", "col": 2, "type": "backend", "label": "文稿音轨抓取", "sublabel": "cli.py fetch (字幕/音频)", "tag": "优先字幕", "width": 140 },
+    { "id": "text_struct", "lane": "semantic", "col": 3, "type": "database", "label": "语义提炼与表格化", "sublabel": "时间戳对齐 · 概念去重", "tag": "导图文本", "width": 140 },
+    { "id": "scene_detect", "lane": "visual", "col": 2, "type": "cloud", "label": "高熵突变抽帧", "sublabel": "cli.py detect (场景突变)", "tag": "候选帧池", "width": 140 },
+    { "id": "visual_anno", "lane": "visual", "col": 3, "type": "messagebus", "label": "多模态视觉标注", "sublabel": "五大模式 + 扩展图元", "tag": "红框/放大镜", "width": 140 },
+    { "id": "cli_render", "lane": "delivery", "col": 4, "type": "backend", "label": "单文件导图编译器", "sublabel": "cli.py render (单文件封装)", "tag": "Base64 内嵌", "width": 140 },
+    { "id": "web_runtime", "lane": "delivery", "col": 5, "type": "frontend", "label": "交互脑图与离线导出", "sublabel": "检索穿透 · 图谱灯箱 · XMind", "tag": "双主题秒切", "width": 150 }
+  ],
+  "edges": [
+    { "id": "in-doc", "from": "video_src", "to": "cli_doctor", "variant": "default" },
+    { "id": "doc-sem", "from": "cli_doctor", "to": "audio_fetch", "label": "抓取文稿", "variant": "emphasis" },
+    { "id": "doc-vis", "from": "cli_doctor", "to": "scene_detect", "label": "检测画面", "variant": "default" },
+    { "id": "sem-struct", "from": "audio_fetch", "to": "text_struct", "label": "清洗结构化", "variant": "emphasis" },
+    { "id": "vis-anno", "from": "scene_detect", "to": "visual_anno", "label": "批注渲染", "variant": "default" },
+    { "id": "struct-render", "from": "text_struct", "to": "cli_render", "label": "导图文本", "variant": "emphasis" },
+    { "id": "anno-render", "from": "visual_anno", "to": "cli_render", "label": "关联图谱", "variant": "default" },
+    { "id": "render-view", "from": "cli_render", "to": "web_runtime", "label": "单文件交付", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "双轨解耦流水线 (Dual-Track Decoupled Pipeline)",
+      "items": [
+        "语义时序流：解析字幕与音频，将冗长口述提炼为原子化树状概念、机制拆解与对比表格",
+        "视觉高熵流：镜头突变检测精准捕获拓扑图、代码与面板，自动完成红框焦点与流程图元批注"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "单文件编译与离线生态 (Zero-Server Architecture)",
+      "items": [
+        "全资源内嵌：编译器将 Markmap 核心引擎与图片 Base64 编码，生成零外部依赖单 HTML",
+        "纯前端 XMind 打包：浏览器内纯 JSZip 组装原生 .xmind，无需后端转换或第三方软件转码"
+      ]
+    }
+  ]
+}

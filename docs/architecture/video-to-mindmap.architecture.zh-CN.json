@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "video-to-mindmap 系统架构图",
+    "locale": "zh-CN",
+    "output": "video-to-mindmap.architecture.zh-CN.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "full-pipeline",
+        "label": "端到端主执行流水线",
+        "focus": ["cli_hub", "media_fetcher", "llm_reasoner", "mindmap_compiler", "export_deliverable"],
+        "note": "从 CLI 入口到生成独立交互式 HTML/XMind 导图的完整链路。"
+      },
+      {
+        "id": "dual-track-flow",
+        "label": "双轨解耦处理流",
+        "focus": ["media_fetcher", "scene_detector", "llm_reasoner", "vision_annotator"],
+        "note": "解耦的时序文本转录流与突变场景关键帧视觉流。"
+      },
+      {
+        "id": "auth-and-storage",
+        "label": "身份鉴权与磁盘工作区",
+        "focus": ["cli_hub", "auth_vault", "media_source", "workspace_store"],
+        "note": "多平台凭据管理仓与任务目录持久化产物生命周期。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "cli_hub",
+      "type": "external",
+      "label": "统一控制中枢",
+      "sublabel": "cli.py (自检与调度)",
+      "tag": "入口命令",
+      "pos": [50, 400],
+      "size": [155, 60]
+    },
+    {
+      "id": "auth_vault",
+      "type": "security",
+      "label": "多平台鉴权仓",
+      "sublabel": "auth_manager.py",
+      "tag": "Cookie仓与扫码",
+      "pos": [50, 240],
+      "size": [155, 60]
+    },
+    {
+      "id": "media_source",
+      "type": "external",
+      "label": "外部视频平台",
+      "sublabel": "B站 / YouTube",
+      "brand": "youtube",
+      "pos": [50, 80],
+      "size": [155, 60]
+    },
+    {
+      "id": "media_fetcher",
+      "type": "backend",
+      "label": "媒体与文稿摄取",
+      "sublabel": "process_video.py",
+      "tag": "yt-dlp与字幕清洗",
+      "pos": [330, 80],
+      "size": [155, 60]
+    },
+    {
+      "id": "scene_detector",
+      "type": "backend",
+      "label": "场景突变探测",
+      "sublabel": "detect_keyframes.py",
+      "tag": "ffmpeg场景切片",
+      "pos": [330, 240],
+      "size": [155, 60]
+    },
+    {
+      "id": "workspace_store",
+      "type": "database",
+      "label": "任务工作区存储",
+      "sublabel": "downloads/<标题>/",
+      "tag": "磁盘资产归档",
+      "pos": [330, 400],
+      "size": [155, 60]
+    },
+    {
+      "id": "llm_reasoner",
+      "type": "cloud",
+      "label": "多模态认知核心",
+      "sublabel": "大模型 / Agent",
+      "tag": "图文降级与决策",
+      "pos": [610, 80],
+      "size": [155, 60]
+    },
+    {
+      "id": "vision_annotator",
+      "type": "backend",
+      "label": "视觉批注引擎",
+      "sublabel": "extract_frame.py",
+      "tag": "PIL四模式图元",
+      "pos": [610, 240],
+      "size": [155, 60]
+    },
+    {
+      "id": "mindmap_compiler",
+      "type": "backend",
+      "label": "导图网页编译器",
+      "sublabel": "generate_html.py",
+      "tag": "SVG树编译器",
+      "pos": [890, 80],
+      "size": [155, 60]
+    },
+    {
+      "id": "export_deliverable",
+      "type": "frontend",
+      "label": "便携交付成果",
+      "sublabel": "HTML / XMind / MD",
+      "tag": "独立自包含",
+      "pos": [890, 240],
+      "size": [155, 60]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "本地媒体流水线",
+      "wraps": ["media_fetcher", "scene_detector", "workspace_store"]
+    },
+    {
+      "kind": "region",
+      "label": "认知综合与视觉引擎",
+      "wraps": ["llm_reasoner", "vision_annotator"]
+    },
+    {
+      "kind": "security-group",
+      "label": "交互呈现与交付运行时",
+      "wraps": ["mindmap_compiler", "export_deliverable"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "cli-preflight",
+      "from": "cli_hub",
+      "to": "auth_vault",
+      "label": "预检鉴权",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-to-platform",
+      "from": "auth_vault",
+      "to": "media_source",
+      "label": "会话凭证",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "source-to-fetcher",
+      "from": "media_source",
+      "to": "media_fetcher",
+      "label": "音视频与字幕",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "cli-to-workspace",
+      "from": "cli_hub",
+      "to": "workspace_store",
+      "label": "初始化工作区",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "fetcher-to-detector",
+      "from": "media_fetcher",
+      "to": "scene_detector",
+      "label": "视频帧",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "detector-to-store",
+      "from": "scene_detector",
+      "to": "workspace_store",
+      "label": "关键帧清单",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "fetcher-to-reasoner",
+      "from": "media_fetcher",
+      "to": "llm_reasoner",
+      "label": "时间戳文稿",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "detector-to-reasoner",
+      "from": "scene_detector",
+      "to": "llm_reasoner",
+      "label": "候选帧",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "reasoner-to-annotator",
+      "from": "llm_reasoner",
+      "to": "vision_annotator",
+      "label": "焦点坐标",
+      "labelDx": 25,
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "annotator-to-store",
+      "from": "vision_annotator",
+      "to": "workspace_store",
+      "label": "批注配图",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "reasoner-to-compiler",
+      "from": "llm_reasoner",
+      "to": "mindmap_compiler",
+      "label": "原子导图MD",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "compiler-to-deliverable",
+      "from": "mindmap_compiler",
+      "to": "export_deliverable",
+      "label": "编译发布",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "双轨数据摄取",
+      "items": [
+        "时序全语义轨：yt-dlp 抓取原片与 CC 字幕，清洗为秒级时间戳文稿",
+        "事件自适应视觉轨：ffmpeg gt(scene,0.35) 提取 15~30 张场景突变帧",
+        "图文降级前置：彻底剔除口述面部特写与风光氛围低熵垫片"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "认知提炼与视觉锚定",
+      "items": [
+        "图文降级铁律：大字课件与对比清单强制降维转化为三级树或微表格",
+        "原子化三层语法：核心概念 (英文原名) -> 底层运作机制 -> 参数量化指标",
+        "自适应视觉锚定：全景纯景、局部微观焦点、双端平权对峙、时序胶卷"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "独立交互式交付",
+      "items": [
+        "单文件自包含 HTML：内置 Tokyo Night 深色拟态与 Clean Minimal 浅色",
+        "电影级图片灯箱：支持点击放大、平移缩放 (Pan & Zoom) 与 1:1 像素级还原",
+        "多端格式导出：浏览器端纯前端一键导出原生 .xmind 文件与高清 SVG/PNG"
+      ]
+    }
+  ]
+}

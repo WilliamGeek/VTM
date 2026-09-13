@@ -1,0 +1,101 @@
+{
+  "search": {
+    "searchInput": {
+      "x": 565.953125,
+      "y": 33.5,
+      "width": 76.046875,
+      "height": 16
+    },
+    "searchCount": {
+      "x": 646,
+      "y": 35,
+      "width": 22,
+      "height": 13
+    },
+    "searchNav": {
+      "x": 687,
+      "y": 32.5,
+      "width": 19,
+      "height": 18
+    },
+    "highlightTarget": null
+  },
+  "lightbox": {
+    "lightbox": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080
+    },
+    "lightboxImg": {
+      "x": 478.5,
+      "y": 68,
+      "width": 963,
+      "height": 870
+    },
+    "dock": {
+      "x": 681.5,
+      "y": 1006,
+      "width": 557,
+      "height": 50
+    },
+    "downloadBtn": {
+      "x": 1143.5,
+      "y": 1015,
+      "width": 32,
+      "height": 32
+    },
+    "zoomInBtn": {
+      "x": 1011.5,
+      "y": 1015,
+      "width": 32,
+      "height": 32
+    }
+  },
+  "export": {
+    "btnExport": {
+      "x": 1292,
+      "y": 25,
+      "width": 86,
+      "height": 33
+    },
+    "dropdown": {
+      "x": 1292,
+      "y": 25,
+      "width": 86,
+      "height": 33
+    },
+    "xmind": {
+      "x": 1210,
+      "y": 73,
+      "width": 161,
+      "height": 35
+    },
+    "png": {
+      "x": 1210,
+      "y": 111,
+      "width": 161,
+      "height": 35
+    },
+    "svg": {
+      "x": 1210,
+      "y": 149,
+      "width": 161,
+      "height": 35
+    },
+    "md": {
+      "x": 1210,
+      "y": 187,
+      "width": 161,
+      "height": 35
+    }
+  },
+  "theme": {
+    "btnTheme": {
+      "x": 1204,
+      "y": 26.5,
+      "width": 41,
+      "height": 30
+    }
+  }
+}

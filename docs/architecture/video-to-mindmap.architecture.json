@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Video to Mindmap Architecture",
+    "output": "video-to-mindmap.architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "full-pipeline",
+        "label": "Primary Processing Pipeline",
+        "focus": ["cli_hub", "media_fetcher", "llm_reasoner", "mindmap_compiler", "export_deliverable"],
+        "note": "Follow the primary end-to-end flow from CLI invocation to interactive HTML deliverable."
+      },
+      {
+        "id": "dual-track-flow",
+        "label": "Dual-Track Decoupled Pipeline",
+        "focus": ["media_fetcher", "scene_detector", "llm_reasoner", "vision_annotator"],
+        "note": "Examine the decoupled temporal semantic stream and adaptive high-entropy visual stream."
+      },
+      {
+        "id": "auth-and-storage",
+        "label": "Auth and Storage Boundaries",
+        "focus": ["cli_hub", "auth_vault", "media_source", "workspace_store"],
+        "note": "Trace cookie vault authentication and task workspace artifact lifecycle."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "cli_hub",
+      "type": "external",
+      "label": "Unified CLI",
+      "sublabel": "cli.py (Doctor & Dispatch)",
+      "tag": "Entrypoint",
+      "pos": [50, 400],
+      "size": [150, 60]
+    },
+    {
+      "id": "auth_vault",
+      "type": "security",
+      "label": "Auth Manager",
+      "sublabel": "auth_manager.py",
+      "tag": "Cookie Vault & QR",
+      "pos": [50, 240],
+      "size": [150, 60]
+    },
+    {
+      "id": "media_source",
+      "type": "external",
+      "label": "Media Platforms",
+      "sublabel": "Bilibili / YouTube",
+      "brand": "youtube",
+      "pos": [50, 80],
+      "size": [150, 60]
+    },
+    {
+      "id": "media_fetcher",
+      "type": "backend",
+      "label": "Media Fetcher",
+      "sublabel": "process_video.py",
+      "tag": "yt-dlp & Subtitles",
+      "pos": [320, 80],
+      "size": [150, 60]
+    },
+    {
+      "id": "scene_detector",
+      "type": "backend",
+      "label": "Scene Detector",
+      "sublabel": "detect_keyframes.py",
+      "tag": "ffmpeg Scene Cut",
+      "pos": [320, 240],
+      "size": [150, 60]
+    },
+    {
+      "id": "workspace_store",
+      "type": "database",
+      "label": "Workspace Storage",
+      "sublabel": "downloads/<title>/",
+      "tag": "Disk Artifacts",
+      "pos": [320, 400],
+      "size": [150, 60]
+    },
+    {
+      "id": "llm_reasoner",
+      "type": "cloud",
+      "label": "Cognitive Core",
+      "sublabel": "Multimodal LLM / Agent",
+      "tag": "Text/Table Superiority",
+      "pos": [590, 80],
+      "size": [150, 60]
+    },
+    {
+      "id": "vision_annotator",
+      "type": "backend",
+      "label": "Vision Annotator",
+      "sublabel": "extract_frame.py",
+      "tag": "PIL 4-Mode Primitives",
+      "pos": [590, 240],
+      "size": [150, 60]
+    },
+    {
+      "id": "mindmap_compiler",
+      "type": "backend",
+      "label": "Mindmap Compiler",
+      "sublabel": "generate_html.py",
+      "tag": "SVG Tree Compiler",
+      "pos": [860, 80],
+      "size": [150, 60]
+    },
+    {
+      "id": "export_deliverable",
+      "type": "frontend",
+      "label": "Client Deliverables",
+      "sublabel": "HTML / XMind / Markdown",
+      "tag": "Self-Contained",
+      "pos": [860, 240],
+      "size": [150, 60]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Local Media Pipeline",
+      "wraps": ["media_fetcher", "scene_detector", "workspace_store"]
+    },
+    {
+      "kind": "region",
+      "label": "Cognitive Synthesis Engine",
+      "wraps": ["llm_reasoner", "vision_annotator"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Interactive Presentation Tier",
+      "wraps": ["mindmap_compiler", "export_deliverable"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "cli-preflight",
+      "from": "cli_hub",
+      "to": "auth_vault",
+      "label": "preflight",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-to-platform",
+      "from": "auth_vault",
+      "to": "media_source",
+      "label": "cookies",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "source-to-fetcher",
+      "from": "media_source",
+      "to": "media_fetcher",
+      "label": "stream & CC",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "cli-to-workspace",
+      "from": "cli_hub",
+      "to": "workspace_store",
+      "label": "workspace",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "fetcher-to-detector",
+      "from": "media_fetcher",
+      "to": "scene_detector",
+      "label": "frames",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "detector-to-store",
+      "from": "scene_detector",
+      "to": "workspace_store",
+      "label": "manifest",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "fetcher-to-reasoner",
+      "from": "media_fetcher",
+      "to": "llm_reasoner",
+      "label": "transcript",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "detector-to-reasoner",
+      "from": "scene_detector",
+      "to": "llm_reasoner",
+      "label": "candidate frames",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "reasoner-to-annotator",
+      "from": "llm_reasoner",
+      "to": "vision_annotator",
+      "label": "bboxes",
+      "labelDx": 25,
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "annotator-to-store",
+      "from": "vision_annotator",
+      "to": "workspace_store",
+      "label": "annotated png",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "reasoner-to-compiler",
+      "from": "llm_reasoner",
+      "to": "mindmap_compiler",
+      "label": "markdown",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "compiler-to-deliverable",
+      "from": "mindmap_compiler",
+      "to": "export_deliverable",
+      "label": "compile",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Dual-Track Ingestion",
+      "items": [
+        "Track 1: yt-dlp fetches audio & CC subtitles to clean timestamped transcripts",
+        "Track 2: ffmpeg gt(scene,0.35) adaptively captures 15-30 candidate keyframes",
+        "Zero-fluff pre-filtering drops talking-head and low-entropy slides"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Cognitive Distillation",
+      "items": [
+        "Text/Table Superiority Protocol downgrades PPT slides to Markdown tables",
+        "3-tier syntax enforces Concept -> Mechanism -> Parameters hierarchy",
+        "Visual Anchoring selects Pure, Focus, Dual, or Filmstrip mode per topology"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Standalone Delivery",
+      "items": [
+        "Single-file self-contained HTML with Tokyo Night & Minimal themes",
+        "Cinema Lightbox with pan, zoom, and 1:1 pixel inspection",
+        "Pure-browser zero-dependency native .xmind file generation"
+      ]
+    }
+  ]
+}

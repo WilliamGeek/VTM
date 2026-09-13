@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "video-to-mindmap"
+dynamic = ["version"]
+description = "Extract atomic knowledge and visual keyframes from videos into interactive mindmaps and native XMind files."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "video-to-mindmap contributors"}
+]
+keywords = [
+    "mindmap",
+    "video-processing",
+    "multimodal",
+    "xmind",
+    "ai-agent",
+    "knowledge-extraction",
+    "bilibili",
+    "youtube"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "pillow>=10.0.0",
+    "yt-dlp>=2024.08.01",
+    "qrcode>=7.4.2",
+]
+
+[project.scripts]
+video-mindmap = "cli:main"
+
+[tool.setuptools]
+packages = ["scripts"]
+py-modules = ["cli", "__main__"]
+
